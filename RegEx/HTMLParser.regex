@@ -1,0 +1,13 @@
+(?(DEFINE)
+  (?<TEXT>
+    [^<>]++
+  )
+  (?<EMPTY_ELEMENT>
+    <(?<TAG_NAME>[^\/ ][^> ]*)(?:\ +[^> ]+)*\ *\/>
+  )
+  (?<ELEMENT>
+    <(?<TAG_NAME>[^\/ ][^> ]*)(?:\ +[^> ]+)*>(?:(?&TEXT)|(?&EMPTY_ELEMENT)|(?&ELEMENT))*<\/\g<TAG_NAME>>
+  )
+)
+
+<(?<TAG_NAME>font)(?:\ +[^> ]+)*>(?<CHILD>(?&TEXT)|(?&EMPTY_ELEMENT)|(?&ELEMENT))<\/\g<TAG_NAME>>
