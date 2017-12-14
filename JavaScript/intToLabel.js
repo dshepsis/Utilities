@@ -1,9 +1,9 @@
-/* Produces a string vertex label based on its index (>=0): */
-function intToLabel(index) {
+/* Produces a string label based on an integer number.
+ * E.g. 0=>'A', 1=>'B', 26=>'AA', 27=>'AB' etc. */
+function intToLabel(num) {
   var label = "";
-  index = Math.floor(index);
-  for (; index >= 0; index = Math.floor(index/26)-1) {
-    label = String.fromCharCode(index%26+65) + label;
+  for (num = Math.floor(num); num >= 0; num = Math.floor(num/26)-1) {
+    label = String.fromCharCode(num%26+65) + label;
   }
   return label;
 }

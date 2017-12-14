@@ -14,9 +14,9 @@
  * the blocking timer, preserving the rate-limitting property. */
 function throttle(fn, timeBetweenCalls, queue1Call) {
   let blocked = false, queuedArgs = null;
-  return function limitedFn() {
+  return function limitedFn(...args) {
     let context = this;
-    queuedArgs = (queue1Call && blocked) ? arguments : null;
+    queuedArgs = (queue1Call && blocked) ? args : null;
     if (blocked) return;
     blocked = true;
     const onTimeout = ()=>{
@@ -29,6 +29,6 @@ function throttle(fn, timeBetweenCalls, queue1Call) {
 
     /* Call the function with apply, to preserve
      * context for things like prototype functions: */
-    fn.apply(context, arguments);
+    fn.apply(context, args);
   }
 }
