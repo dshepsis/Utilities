@@ -5,15 +5,13 @@ const inputEle = getEleById('code-to-break');
 const outputEle = getEleById('output');
 
 inputEle.addEventListener('input', (e)=>{
-  console.log(breakLine(inputEle.innerHTML));
-  outputEle.innerText = breakLine(inputEle.value) + "\n";
+  outputEle.innerText = breakLine(inputEle.value);
 }, false);
 
 function highlightContents(elem){
-  //var elem = document.getElementById("utput");
-  var range = document.createRange();
+  const range = document.createRange();
   range.selectNodeContents(elem);
-  var selection = window.getSelection();
+  const selection = window.getSelection();
   selection.removeAllRanges();
   selection.addRange(range);
 }

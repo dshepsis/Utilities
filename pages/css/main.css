@@ -87,7 +87,7 @@ a:hover {
 }
 a#icon-link {
   /* For whatever reason, the link is taller than the svg unless I do this: */
-  display: flex;
+  line-height: 0;
 }
 
 /* SVG Styling: */
@@ -97,6 +97,9 @@ svg.defs {
 #header-icon {
   height: 2.5em;
   fill: #ddd;
+}
+#header-icon:hover {
+  fill: #fff;
 }
 
 textarea {
