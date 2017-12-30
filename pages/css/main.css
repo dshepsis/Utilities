@@ -21,7 +21,7 @@ body {
   width: 1000px;
   margin: auto;
 }
-@media (max-width: 840px) {
+@media (max-width: 1000px) {
   .center-col {
     width: 100%;
   }
