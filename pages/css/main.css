@@ -32,6 +32,9 @@ main {
   background-color: #eeeef3;
   box-shadow: 0 0 20px 5px #0004;
 }
+main > * {
+  margin: 10px 0;
+}
 main > *:first-child {
   margin-top: 0;
 }
@@ -45,6 +48,9 @@ header, footer {
   background-color: #224430;
   color: #eeeef3;
   padding: 0.5em 0; /* Top&bottom left&right  */
+}
+header #header-content, footer #footer-content{
+  padding: 0 20px;
 }
 header #header-content > *, footer #footer-content > * {
   margin-top: 0;
@@ -79,6 +85,10 @@ header a, footer a {
 a:hover {
   color: inherit;
 }
+a#icon-link {
+  /* For whatever reason, the link is taller than the svg unless I do this: */
+  display: flex;
+}
 
 /* SVG Styling: */
 svg.defs {
@@ -94,7 +104,8 @@ textarea {
   height: 100px;
   font-size: 1rem;
   max-width: 100%;
-
+  min-height: 1.5em;
+  min-width: 10em;
 }
 /* Output styling: */
 #output-container {
@@ -108,4 +119,5 @@ textarea {
   max-height: 500px;
   min-width: 200px;
   min-height: 1em;
+  margin: 0;
 }
