@@ -121,6 +121,7 @@ textarea {
   overflow: auto;
   max-height: 500px;
   min-width: 200px;
-  min-height: 1em;
+  min-height: 2em;
   margin: 0;
+  tab-size: 2;
 }
