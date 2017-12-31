@@ -29,17 +29,26 @@ function breakLine(str) {
   let nextLineTabLevel = currTabLevel;
   while (ch < len-1) {
     let lineBrokenAfterThisChar = false;
+    let currCharIsOpenBrace = false;
     let nextLineTabLevel = currTabLevel;
     const currChar = str.charAt(ch);
     const nextChar = str.charAt(ch+1);
     if        (equalsAny(currChar, '([{')) {
       ++nextLineTabLevel;
       lineBrokenAfterThisChar = true;
+      currCharIsOpenBrace = true;
     } else if (equalsAny(currChar, ','  )) {
       lineBrokenAfterThisChar = true;
-    } else if (equalsAny(nextChar, ')]}')) {
+    }
+
+    /* Not an "else" block because we may have a comma or open bracket directly
+     * followed by a closing bracket. Some people deliberately use a comma at
+     * the end of a list so that every line looks the same. */
+    if (equalsAny(nextChar, ')]}')) {
       --nextLineTabLevel;
-      lineBrokenAfterThisChar = true;
+      /* If we have an open brace followed by a close brace (e.g. a
+       * zero-parameter function call), do not break the line. */
+      lineBrokenAfterThisChar = !currCharIsOpenBrace;
     }
 
     if (lineBrokenAfterThisChar) {
