@@ -44,10 +44,11 @@ main > *:last-child {
 
 /* Header and footer styling: */
 header, footer {
+  position: relative; /* So that they are not overlayed by the main section */
   width: 100%;
-  background-color: #224430;
   color: #eeeef3;
-  padding: 0.5em 0; /* Top&bottom left&right  */
+  padding: 0.5em 0;
+  background-color: hsla(153, 51%, 18%, 1);
 }
 header #header-content, footer #footer-content{
   padding: 0 20px;

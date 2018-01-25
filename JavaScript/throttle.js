@@ -15,7 +15,7 @@
 function throttle(fn, timeBetweenCalls, queue1Call) {
   let blocked = false, queuedArgs = null;
   return function limitedFn(...args) {
-    let context = this;
+    const context = this;
     queuedArgs = (queue1Call && blocked) ? args : null;
     if (blocked) return;
     blocked = true;
@@ -24,11 +24,11 @@ function throttle(fn, timeBetweenCalls, queue1Call) {
       if (queue1Call && queuedArgs !== null) {
         limitedFn.apply(context, queuedArgs);
       }
-    }
+    };
     window.setTimeout(onTimeout, timeBetweenCalls);
 
     /* Call the function with apply, to preserve
      * context for things like prototype functions: */
     fn.apply(context, args);
-  }
+  };
 }

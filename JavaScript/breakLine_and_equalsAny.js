@@ -37,7 +37,7 @@ function breakLine(str) {
       ++nextLineTabLevel;
       lineBrokenAfterThisChar = true;
       currCharIsOpenBrace = true;
-    } else if (equalsAny(currChar, ','  )) {
+    } else if (equalsAny(currChar, ',;'  )) {
       lineBrokenAfterThisChar = true;
     }
 
