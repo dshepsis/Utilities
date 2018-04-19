@@ -7,7 +7,7 @@
  * chain. Any arguments to the returned function are passed as the second,
  * third, and so on arguments to the first function passed to callbackCompose.
  *
- * All parameter functions must accept a callback as their first argument,
+ * All parameter functions must accept a callback as their last argument,
  * except the last function in the list, which of course has no more callbacks
  * to chain towards.
  *
@@ -16,11 +16,11 @@
  * callback. */
 function callbackCompose(...funcs) {
   const callbackBind = (func, callback)=>{
-    return (...args)=>func(callback, ...args);
-  }
+    return (...args)=>func(...args, callback);
+  };
   let i = funcs.length-1;
   let chain = funcs[i];
-  while (i>0) {
+  while (i > 0) {
     --i;
     chain = callbackBind(funcs[i], chain);
   }
@@ -29,16 +29,16 @@ function callbackCompose(...funcs) {
 
 /* Example: */
 callbackCompose(
-  function getData(cb, url) {
+  function getData(url, cb) {
     console.log(`Getting data from ${url}...`);
-    window.setTimeout(()=>cb({text:"My Data",next:"/other/url"}), 3000);
+    window.setTimeout(()=>cb({text: "My Data", next: "/other/url"}), 3000);
   },
-  function doWithData(cb, data) {
+  function doWithData(data, cb) {
     console.log(`Got data!: <<${data.text}>>.`);
     console.log(`Getting additional data from ${data.next}...`);
-    window.setTimeout(()=>cb({text:"We're done!"}), 1000);
+    window.setTimeout(()=>cb({text: "We're done!"}), 1000);
   },
   function doneWithData(data) {
     console.log(`Got final bit of data!: <<${data.text}>>`);
   }
-)
+)('https://www.example.com');

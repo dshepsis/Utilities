@@ -4,14 +4,14 @@ function appendChildren (parent, children) {
     if (item instanceof HTMLElement) {
       parent.appendChild(item);
     } else {
-      let text = document.createTextNode(String(item));
+      const text = document.createTextNode(String(item));
       parent.appendChild(text);
     }
   }
 
   if (Array.isArray(children)) {
-    for (let i = 0, len = children.length; i < len; ++i) {
-      appendItem(children[i]);
+    for (const child of children) {
+      appendItem(child);
     }
   } else {
     appendItem(children);
@@ -64,18 +64,18 @@ function appendChildren (parent, children) {
  */
 function makeElement(type, content, attrObj) {
   /* The new element being populated: */
-  let newEle = document.createElement(type);
+  const newEle = document.createElement(type);
 
   /* If no content parameter was passed, leave the element childless. Otherwise,
    * add the content (array or single item) to newEle: */
   if (content !== undefined) {
-    appendChildren(newEle, content)
+    appendChildren(newEle, content);
   }
 
   /* Apply information from the attributes object: */
   if (attrObj !== undefined) {
-    for (let attribute in attrObj) {
-     newEle.setAttribute(attribute, attrObj[attribute]);
+    for (const attribute of Object.keys(attrObj)) {
+      newEle.setAttribute(attribute, attrObj[attribute]);
     }
   }
   return newEle;
