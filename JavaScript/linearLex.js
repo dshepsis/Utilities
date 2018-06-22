@@ -1,50 +1,51 @@
-function linearLex(str, grammar) {
+const linearLex = (grammar)=> {
   const anyType = Object.keys(grammar);
   {
     const startIndex = anyType.indexOf('start');
     if (startIndex !== -1) anyType.splice(startIndex, 1);
   }
-  const tokens = [];
-  let allowedTypes = anyType;
-  if (grammar.start !== undefined) allowedTypes = grammar.start;
-  
-  /* Run the loop at least once, even if the string is empty (''), to allow for
-   * potential matches, e.g. /(\s*)/: */
-  let once = true;
-  outer: for (let i = 0, len = str.length; once || i < len; once = false) {
-    const remainingStr = str.substring(i);
-    for (const typeName of allowedTypes) {
-      const type = grammar[typeName];
-      const match = remainingStr.match(type.regex);
-      if (match === null) continue;
-      i += match.index;
-      const start = i;
-      i += match[0].length;
-      const end = i;
-      tokens.push({match, type: typeName, start, end});
-      allowedTypes = type.next;
-      if (allowedTypes === undefined || allowedTypes === "*") {
-        allowedTypes = anyType;
+  const startingTypes = (grammar.start === undefined) ?  anyType : grammar.start;
+  return (str)=>{
+    const tokens = [];
+    let allowedTypes = startingTypes;
+    /* Run the loop at least once, even if the string is empty (''), to allow
+     * for potential matches, e.g. /(\s*)/: */
+    let once = true;
+    outer: for (let i = 0, len = str.length; once || i < len; once = false) {
+      const remainingStr = str.substring(i);
+      for (const typeName of allowedTypes) {
+        const type = grammar[typeName];
+        const match = remainingStr.match(type.regex);
+        if (match === null) continue;
+        i += match.index;
+        const start = i;
+        i += match[0].length;
+        const end = i;
+        tokens.push({match, type: typeName, start, end});
+        allowedTypes = type.next;
+        if (allowedTypes === undefined || allowedTypes === "*") {
+          allowedTypes = anyType;
+        }
+        continue outer;
       }
-      continue outer;
-    }
-    /* If no match was found: */
-    let locationInfo;
-    if (tokens.length === 0) {
-      locationInfo = `at the start of '${remainingStr}'`;
-    } else {
-      locationInfo = (
-        `in '${remainingStr}' following token of type `+
-        `'${tokens[tokens.length-1].type}'`
+      /* If no match was found: */
+      let locationInfo;
+      if (tokens.length === 0) {
+        locationInfo = `at the start of '${remainingStr}'`;
+      } else {
+        locationInfo = (
+          `in '${remainingStr}' following token of type `+
+          `'${tokens[tokens.length-1].type}'`
+        );
+      }
+      throw new Error(
+        `Lexing Error: Could not find a match ${locationInfo} among the `+
+        `following token types: [${allowedTypes}].`
       );
     }
-    throw new Error(
-      `Lexing Error: Could not find a match ${locationInfo} among the `+
-      `following token types: [${allowedTypes}].`
-    );
-  }
-  return tokens;
-}
+    return tokens;
+  };
+};
 
 const operand = ['not', 'label', 'lParen'];
 const operator = ['and', 'or', 'rParen', 'termSpace'];
@@ -78,12 +79,13 @@ const grammar = {
     regex: /^\s*$/
   }
 };
+const myLexer = linearLex(grammar);
 
 /* Test: */
 
 function t(str) {
-  console.log(linearLex(str, grammar));
-  console.log(linearLex(str, grammar).map(t=>t.match[1]));
+  console.log(myLexer(str));
+  console.log(myLexer(str).map(t=>t.match[1]));
 }
 const str = 'link&!internal';
 t(str);
@@ -99,6 +101,6 @@ function arrayEquals(...arrs) {
 }
 const exp = ['label', 'and', 'not', 'label'];
 console.assert(arrayEquals(
-  linearLex(str, grammar).map(t=>t.type),
+  myLexer(str).map(t=>t.type),
   exp
 ), `Results from parsing "${str}" did not match the expected [${exp}].`);
