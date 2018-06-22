@@ -1,13 +1,14 @@
+const removeByValue = (arr, val)=>{
+  const valIndex = arr.indexOf(val);
+  if(valIndex !== -1) arr.splice(valIndex, 1);
+};
 const linearLex = (grammar)=> {
-  const anyType = Object.keys(grammar);
-  {
-    const startIndex = anyType.indexOf('start');
-    if (startIndex !== -1) anyType.splice(startIndex, 1);
-  }
+  const anyType = removeByValue(Object.keys(grammar), 'start');
   const startingTypes = (grammar.start === undefined) ?  anyType : grammar.start;
   return (str)=>{
     const tokens = [];
     let allowedTypes = startingTypes;
+
     /* Run the loop at least once, even if the string is empty (''), to allow
      * for potential matches, e.g. /(\s*)/: */
     let once = true;
@@ -17,10 +18,9 @@ const linearLex = (grammar)=> {
         const type = grammar[typeName];
         const match = remainingStr.match(type.regex);
         if (match === null) continue;
-        i += match.index;
-        const start = i;
-        i += match[0].length;
-        const end = i;
+        const start = i + match.index;
+        const end = start + match[0].length;
+        i = end;
         tokens.push({match, type: typeName, start, end});
         allowedTypes = type.next;
         if (allowedTypes === undefined || allowedTypes === "*") {
