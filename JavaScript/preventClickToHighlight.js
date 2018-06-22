@@ -3,12 +3,12 @@
  * which contains text, but also has some click functionality, so that the user
  * is not annoyed by accidentally highlighting text when they simply meant to
  * repeatedly fire the click event. */
-function preventClickToHighlight(element) {
+const preventClickToHighlight = (()=>{
   function blockMultipleMouseDownEvent(event) {
-    if (event.detail > 1) {
-      event.preventDefault();
-    }
+    if (event.detail > 1) event.preventDefault();
   }
-  element.addEventListener("mousedown", blockMultipleMouseDownEvent);
-  return element;
-}
+  return (element)=>{
+    element.addEventListener("mousedown", blockMultipleMouseDownEvent);
+    return element;
+  };
+});

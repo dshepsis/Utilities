@@ -27,21 +27,21 @@ function buffer(func, timeBetweenCalls, bufferSize) {
     }
     /* Place the new item at the start of the buffer (queue): */
     argBuffer.unshift(item);
-  }
+  };
   let blocked = false;
   return function throttledFn(...args) {
     if (blocked) {
       if (bufferingOn) addToBuffer(args);
-      return
+      return;
     }
     blocked = true;
     const onTimeout = ()=>{
       blocked = false;
       if (bufferingOn && argBuffer.length > 0) {
-        throttledFn.apply(this, argBuffer.pop())
+        throttledFn.apply(this, argBuffer.pop());
       }
-    }
+    };
     window.setTimeout(onTimeout, timeBetweenCalls);
     return func.apply(this, args);
-  }
+  };
 }
