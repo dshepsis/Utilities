@@ -1,13 +1,20 @@
 const removeByValue = (arr, val)=>{
   const valIndex = arr.indexOf(val);
   if(valIndex !== -1) arr.splice(valIndex, 1);
+  return arr;
+};
+const nullishDefault = (...vals)=>{
+  for (const val of vals) if (val !== null && val !== undefined) return val;
+  return null;
 };
 const linearLex = (grammar)=> {
   const anyType = removeByValue(Object.keys(grammar), 'start');
-  const startingTypes = (grammar.start === undefined) ?  anyType : grammar.start;
+  const startingTypes = nullishDefault(grammar.start, anyType);
+  const endingTypes = nullishDefault(grammar.end, anyType);
   return (str)=>{
     const tokens = [];
     let allowedTypes = startingTypes;
+    let lastToken = null;
 
     /* Run the loop at least once, even if the string is empty (''), to allow
      * for potential matches, e.g. /(\s*)/: */
@@ -21,7 +28,8 @@ const linearLex = (grammar)=> {
         const start = i + match.index;
         const end = start + match[0].length;
         i = end;
-        tokens.push({match, type: typeName, start, end});
+        lastToken = {match, type: typeName, start, end};
+        tokens.push(lastToken);
         allowedTypes = type.next;
         if (allowedTypes === undefined || allowedTypes === "*") {
           allowedTypes = anyType;
@@ -35,7 +43,7 @@ const linearLex = (grammar)=> {
       } else {
         locationInfo = (
           `in '${remainingStr}' following token of type `+
-          `'${tokens[tokens.length-1].type}'`
+          `'${lastToken.type}'`
         );
       }
       throw new Error(
@@ -43,6 +51,10 @@ const linearLex = (grammar)=> {
         `following token types: [${allowedTypes}].`
       );
     }
+    if (endingTypes.indexOf(lastToken.type) === -1) throw new Error(
+      `Lexing Error: String terminated with token of type '${lastToken.type}', `+
+      `but only the following are allowed: [${endingTypes}].`
+    );
     return tokens;
   };
 };
@@ -51,6 +63,7 @@ const operand = ['not', 'label', 'lParen'];
 const operator = ['and', 'or', 'rParen', 'termSpace'];
 const grammar = {
   start: operand,
+  end: ['label', 'rParen', 'termSpace'],
   label: {
     regex: /^\s*([\w-]+)/,
     next: operator
