@@ -14,6 +14,7 @@ function equalsAny(val, possibleMatches) {
   return false;
 }
 
+/*eslint no-unused-vars: ["error", { "varsIgnorePattern": "^breakLine$" }]*/
 function breakLine(str) {
   const len = str.length;
   let ch = 0;
@@ -26,14 +27,13 @@ function breakLine(str) {
   tokenStart = ch;
 
   let currTabLevel = 0;
-  let nextLineTabLevel = currTabLevel;
   while (ch < len-1) {
     let lineBrokenAfterThisChar = false;
     let currCharIsOpenBrace = false;
     let nextLineTabLevel = currTabLevel;
     const currChar = str.charAt(ch);
     const nextChar = str.charAt(ch+1);
-    if        (equalsAny(currChar, '([{')) {
+    if (equalsAny(currChar, '([{')) {
       ++nextLineTabLevel;
       lineBrokenAfterThisChar = true;
       currCharIsOpenBrace = true;
@@ -59,7 +59,7 @@ function breakLine(str) {
       strParts.push(thisToken);
       tokenStart = ch+1;
     }
-    currTabLevel = nextLineTabLevel
+    currTabLevel = nextLineTabLevel;
     ++ch;
   }
   let thisToken = baseTabLevel;
