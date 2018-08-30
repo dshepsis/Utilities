@@ -4,7 +4,7 @@ const nullishDefault = (...vals)=>{
   for (const val of vals) if (val !== null && val !== undefined) return val;
   return null;
 };
-const linearLex = (grammar)=> {
+function linearLex(grammar) {
   const anyType = nullishDefault(
     grammar.DEFAULT_NEXT,
     /* By default, properties in the grammar object are ignored if their value
@@ -80,7 +80,18 @@ const linearLex = (grammar)=> {
             opens: openTag,
           });
         }
+
+        /* Let grammar specify custom behavior on match: */
+        if (typeof type.onMatch === 'function') {
+          const modifiedToken = type.onMatch(lastToken, tokens);
+          if (modifiedToken !== undefined) lastToken = modifiedToken;
+          /* If the returned object has a truthy reject property, ignore this
+           * match: */
+          else if (modifiedToken.reject) continue;
+        }
+
         tokens.push(lastToken);
+
         allowedTypes = type.next;
         if (allowedTypes === undefined || allowedTypes === "*") {
           allowedTypes = anyType;
@@ -116,7 +127,7 @@ const linearLex = (grammar)=> {
     );
     return tokens;
   };
-};
+}
 
 const operand = ['not', 'label', 'lParen'];
 const operator = ['and', 'or', 'rParen', 'termSpace'];
