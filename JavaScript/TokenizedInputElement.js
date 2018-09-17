@@ -38,6 +38,7 @@ const linearLex = (()=>{
 
       const openOperatorStack = [];
       let allowedTypes = startingTypes;
+      let nonMatchingTypes = [];
       let lastToken = null;
 
       /* Run the loop at least once, even if the string is empty (''), to allow
@@ -54,9 +55,11 @@ const linearLex = (()=>{
           }
         }
         for (const typeName of allowedTypes) {
+          nonMatchingTypes.push(typeName);
           const type = grammar[typeName];
           const match = remainingStr.match(type.regex);
           if (match === null) continue;
+          nonMatchingTypes = [];
 
           const start = i + match.index;
           const end = start + match[0].length;
@@ -144,8 +147,8 @@ const linearLex = (()=>{
         /* If no legal matching token was found, try allowing other types.
          * If all types were already checked, just exit. */
         if (allowedTypes === ANY_TYPE) break;
-        const allowedSet = new Set(allowedTypes);
-        allowedTypes = ANY_TYPE.filter(type => !allowedSet.has(type));
+        const nonMatchingSet = new Set(nonMatchingTypes);
+        allowedTypes = ANY_TYPE.filter(type => !nonMatchingSet.has(type));
         if (allowedTypes.length === 0) break;
       }
       if (openOperatorStack.length !== 0) {
