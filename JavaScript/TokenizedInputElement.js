@@ -241,7 +241,7 @@ class TokenizedInputElement {
   }
   /* Gets the tokens which are included in the text selection given by either
    * the inputs selectionStart/End or the parameters if they're provided: */
-  selectedTokens(start, end) {
+  selectedTokens(trimFilter, start, end) {
     const tokens = this.tokens;
     const numTokens = tokens.length;
 
@@ -263,6 +263,19 @@ class TokenizedInputElement {
     for (; tokenEndIndex < numTokens; ++tokenEndIndex) {
       if (tokens[tokenEndIndex].start > end) break;
     }
+
+    /* Allow the user to filter out undesired tokens from the start and end */
+    if (trimFilter !== undefined) {
+      let [trimStart, trimEnd] = [tokenStartIndex, tokenEndIndex - 1];
+      for (; trimStart < tokenEndIndex; ++trimStart) {
+        if (!trimFilter(tokens[trimStart])) break;
+      }
+      for (; trimEnd > trimStart; --trimEnd) {
+        if (!trimFilter(tokens[trimEnd])) break;
+      }
+      [tokenStartIndex, tokenEndIndex] = [trimStart, trimEnd + 1];
+    }
+
     let stringStartIndex, stringEndIndex;
     if (tokenStartIndex === numTokens || tokenEndIndex === 0) {
       /* If no tokens are selected because the selection is entirely before or
@@ -280,8 +293,8 @@ class TokenizedInputElement {
       stringStartIndex, stringEndIndex, substring
     };
   }
-  replaceSelectedTokens(replacementStr, start, end) {
-    const {stringStartIndex, stringEndIndex} = this.selectedTokens(start, end);
+  replaceSelectedTokens(replacementStr, filter, start, end) {
+    const {stringStartIndex, stringEndIndex} = this.selectedTokens(filter, start, end);
     const currentVal = this.element.value;
     const modifiedVal = (
       currentVal.substring(0, stringStartIndex) +
@@ -341,16 +354,17 @@ selOut.style.height = "2em";
 allOut.style.height = "2em";
 const tokenizer = new TokenizedInputElement(input, {grammar});
 
+const labelTokenFilter = (token) => token.type !== "label";
 const stringifyToken = t => t.match ? t.match[0] : t.code.toString();
 tokenizer.onTokenize((tokens)=>{
   console.log(tokens);
-  const selTokens = tokenizer.selectedTokens().tokens;
+  const selTokens = tokenizer.selectedTokens(labelTokenFilter).tokens;
   selOut.innerText = selTokens.map(stringifyToken);
   allOut.innerText = tokens.map(stringifyToken);
 });
 
 input.addEventListener('keyup', ()=>{
-  const selTokens = tokenizer.selectedTokens().tokens;
+  const selTokens = tokenizer.selectedTokens(labelTokenFilter).tokens;
   selOut.innerText = selTokens.map(stringifyToken);
 }, false);
 
@@ -358,5 +372,5 @@ const dogReplace = document.createElement('button');
 dogReplace.innerHTML = 'Dog-ify';
 document.body.appendChild(dogReplace);
 dogReplace.addEventListener('click', ()=>{
-  tokenizer.replaceSelectedTokens('Dog');
+  tokenizer.replaceSelectedTokens('Dog', labelTokenFilter);
 });
