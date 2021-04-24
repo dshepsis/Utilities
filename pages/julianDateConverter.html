@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Okami Map - Loot</title>
+  <meta name="description" content="Map of treasure, clovers, etc. in Okami">
+  <meta name="author" content="Daniel Shepsis">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+html, body {
+  margin: 0;
+  height: 100%;
+}
+body {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  grid-template-rows: 50% 50%;
+}
+* {
+  font-size: 10vw;
+  background: #aaa;
+}
+</style>
+</head>
+<body>
+<button id="jCopy" copy="jDate">Copy</button><input id="jDate" type="text" />
+<button id="gCopy" copy="gDate">Copy</button><input id="gDate" type="text" />
+<script>
+
+/* Converts a Date object to a Gregorian date string of the form "MM/DD/YYYY" */
+function dateToG(date) {
+  return date.toLocaleDateString('en-us');
+  // const month = date.getMonth() + 1 + '';
+  // const day = date.getDate() + '';
+  // const year = date.getFullYear() + '';
+  // return `${month.padStart(2, 0)}/${day.padStart(2, 0)}/${year}`;
+}
+
+/* Converts a Gregorian date string of the form "MM/DD/YYYY" to a Date object: */
+function gToDate(gStr) {
+  const [month, day, year] = gStr.split('/');
+  const year20 = (year.length > 2) ? '20' + year : year;
+  return new Date(year20, month - 1, day);
+}
+
+/* Copied from https://stackoverflow.com/a/40975730 */
+function daysIntoYear(date){
+    return (
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) -
+      Date.UTC(date.getFullYear(), 0, 0)
+    ) / 24 / 60 / 60 / 1000;
+}
+
+/* Converts a Date object to a Julian date string of the form YYDDD: */
+function dateToJ(date) {
+  return `${date.getFullYear() % 100}${daysIntoYear(date)}`;
+}
+
+/* Converts a Julian date string of the form YYDDD to a Date object:  */
+function jToDate(jStr) {
+  const year = '20' + jStr.slice(0, 2);
+  const daysIntoYear = jStr.slice(2);
+  return new Date (year, 0, daysIntoYear);
+}
+
+const now = new Date();
+jDate.value = dateToJ(now);
+gDate.value = dateToG(now);
+
+/* Updates the jDate and gDate input fields to keep them representing the same
+ * value: */
+jDate.addEventListener('input', ()=>gDate.value = dateToG(jToDate(jDate.value)));
+gDate.addEventListener('input', ()=>jDate.value = dateToJ(gToDate(gDate.value)));
+
+function copyButton(e) {
+  const targetID = e.target.getAttribute('copy');
+  if (targetID === null) return;
+  const copyTarget = document.getElementById(targetID);
+  navigator.clipboard.writeText(copyTarget.value);
+}
+jCopy.addEventListener('click', copyButton);
+gCopy.addEventListener('click', copyButton);
+</script>
+
+</body>
+</html>
